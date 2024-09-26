@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fa" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Routing Result With NESHAN</title>
+  <link rel="stylesheet" href="https://static.neshan.org/sdk/mapboxgl/v1.13.2/neshan-sdk/v1.1.1/index.css" />
+  <script src="https://static.neshan.org/sdk/mapboxgl/v1.13.2/neshan-sdk/v1.1.1/index.js"></script>
+  <link rel="stylesheet" href="https://static.neshan.org/sdk/mapboxgl/v1.13.2/neshan-sdk/v1.1.1/index.css" />
+  <script src="https://static.neshan.org/sdk/mapboxgl/v1.13.2/neshan-sdk/v1.1.1/index.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mapbox-polyline/1.2.1/polyline.js"></script>
+
+  <style>
+
+    body {
+    
+      height: 100vh;
+      width: 100vw;
+      margin: 0;
+    }
+
+    #map {
+      height: 100%;
+      width: 100%;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div id="map"></div>
+
+  <script type="text/javascript">
+
+  window.onload = function() {
+
+    let Response = JSON.parse(localStorage.getItem("Result_JSON"));
+
+      let A_1 =   localStorage.getItem("A_1")
+      let A_2 =   localStorage.getItem("A_2")
+
+      let B_1 =   localStorage.getItem("B_1")
+      let B_2 =   localStorage.getItem("B_2")
+
+      let C_1 =   localStorage.getItem("C_1")
+      let C_2 =   localStorage.getItem("C_2")
+
+      let D_1 =   localStorage.getItem("D_1")
+      let D_2 =   localStorage.getItem("D_2")
+
+
+    console.log("recive" , Response);
+
+      const neshanMap = new nmp_mapboxgl.Map({
+      mapType: nmp_mapboxgl.Map.mapTypes.neshanVector,
+      container: "map",
+      zoom: 12,
+      pitch: 0,
+      center: [A_1, A_2],
+      minZoom: 2,
+      maxZoom: 21,
+      trackResize: true,
+      mapKey: "web.9e03ae0de3ab4eb5bc619c13117e2e2c",
+      poi: true,
+      traffic: false,
+      mapTypeControllerOptions: {
+        show: true,
+      },
+
+    });
+
+
+  var routes = [];
+    var points = [];
+
+    for (let k = 0; k < Response.routes.length; k++) {
+      for (let j = 0; j < Response.routes[k].legs.length; j++) {
+        for (let i = 0; i < Response.routes[k].legs[j].steps.length; i++) {
+
+          var step = Response.routes[k].legs[j].steps[i]["polyline"];
+          var point = Response.routes[k].legs[j].steps[i]["start_location"];
+
+          var route = polyline.decode(step, 5);
+
+          route.map(item => { item.reverse() })
+
+          routes.push(route);
+          points.push(point);
+
+        }
+      }
+    }
+
+ var routeObj = {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'MultiLineString',
+          coordinates: routes
+        }
+      }
+    ]
+};
+
+ var pointsObj = {
+    type: 'FeatureCollection',
+    features: [
+    {
+      type:"Feature",
+      geometry:
+          {
+              "type": "MultiPoint",
+              "coordinates": points
+          }
+    }
+  ]
+};
+
+  neshanMap.on('load', function () {
+
+    neshanMap.addSource('route', {
+      type: 'geojson',
+      data: routeObj
+    });
+    neshanMap.addSource('points1', {
+      type: 'geojson',
+      data: pointsObj
+    });
+
+    neshanMap.addLayer({
+      id: 'route-line',
+      type: 'line',
+      source: 'route',
+      layout: {
+        'line-join': 'round',
+        'line-cap': 'round'
+      },
+      paint: {
+        'line-color': '#250ECD',
+        'line-width': 9
+      }
+    });
+
+    neshanMap.addLayer({
+      id: 'points1',
+      type: 'circle',
+      source: 'points1',
+      paint: {
+        "circle-color" : "#9fbef9",
+        "circle-stroke-color":"#FFFFFF",
+        "circle-stroke-width": 2,
+        "circle-radius" : 5
+      }
+    });
+  });
+
+  var marker_with_popup1 = new nmp_mapboxgl.Marker({ color: "#d90b0b"  })
+  .setLngLat([A_1, A_2])
+  .addTo(neshanMap);
+
+  var marker_with_popup2 = new nmp_mapboxgl.Marker({ color: "#0b34d9" })
+  .setLngLat([B_1, B_2])
+  .addTo(neshanMap);
+
+var marker_with_popup3 = new nmp_mapboxgl.Marker({ color: "#0bd91f" })
+  .setLngLat([C_1, C_2])
+  .addTo(neshanMap);
+
+
+var marker_with_popup4 = new nmp_mapboxgl.Marker({ color: "#cbd90b" })
+  .setLngLat([D_1, D_2])
+  .addTo(neshanMap);
+
+}
+    </script>
+  </body>
+</html>
+
+

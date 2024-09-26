@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Navigation With NESHAN API Project - Hamid Reza Heidari">
+    <meta name="author" content="Hamid Reza Heidari - Mechatronic MEng - AUT">
+    <meta name="keywords" content="API,AUT,NESHAN,Mechatronic">
+    <link rel="stylesheet" href="Style.css">
+</head>
+<body>
+ 
+<script>
+  let API_Result;
+</script>
+
+  <div class="container">
+    <h2>Navigation With NESHAN</h2>
+    <h1>Hamid Reza Heidari - Mechatronic MEng - AUT</h1>
+    
+    <form action="">
+      <div class="fields">
+        <span>
+         <input type="number" step="any" id="A_LA" placeholder="1-Latitude" required />
+         <input type="number" step="any" id="A_LO" placeholder="1-Longitude" required />
+      </span>
+      <br />
+       <span>
+        <input type="number" step="any" id="B_LA" placeholder="2-Latitude" />
+        <input type="number" step="any" id="B_LO" placeholder="2-Longitude" />
+      </span>
+      <br />
+      <span>
+        <input type="number" step="any" id="C_LA" placeholder="3-Latitude" />
+        <input type="number" step="any" id="C_LO" placeholder="3-Longitude" />
+     </span>
+     <br />
+     <span>
+        <input type="number" step="any" id="D_LA" placeholder="4-Latitude" required />
+        <input type="number" step="any" id="D_LO" placeholder="4-Longitude" required />
+    </span>
+      </div>
+      <div class="submit">
+        <input onclick="window.open('API.html')" class="submit" value="GO!" type="button" id="go" />
+        <br>
+        <br>
+        <br>
+        <input  style="display: none; width: fit-content; color:chartreuse ; text-align: center; margin: auto;"   class="submit" value="Download JSON File" type="button" id="downloadapi" />
+        <a id="downloadAnchorElem" style="display:none"></a>
+      
+      </div>
+    </form>
+</div>
+
+<div>
+  <script>
+  
+  document.querySelector('#go').addEventListener('click',API_Start)
+  document.querySelector('#downloadapi').addEventListener('click',API_Download)
+
+  function API_Start()
+  {
+
+      document.getElementById('downloadapi').style.display ='block';
+
+      var A_LA =   document.getElementById('A_LA').value;
+      var A_LO =   document.getElementById('A_LO').value;
+  
+      var B_LA =   document.getElementById('B_LA').value;
+      var B_LO =   document.getElementById('B_LO').value;
+  
+      var C_LA =   document.getElementById('C_LA').value;
+      var C_LO =   document.getElementById('C_LO').value;
+  
+      var D_LA =   document.getElementById('D_LA').value;
+      var D_LO =   document.getElementById('D_LO').value;
+  
+  
+      var A =`${A_LA},${A_LO}`;
+      var B =`${B_LA},${B_LO}`;
+      var C =`${C_LA},${C_LO}`;
+      var D =`${D_LA},${D_LO}`;
+
+
+      console.log('A:', A)
+      console.log('B:', B) 
+      console.log('C:', C) 
+      console.log('D:', D) 
+
+      let Address;
+        
+      var requestOptions = {
+        method: 'GET',
+        headers: {'api-key' : "service.ed508024d4f8476393f23fae8db8865e"},
+        redirect: 'follow'
+      };
+
+
+      
+      
+      if ((B_LA == "" || B_LO == "" ) && (C_LA == "" || C_LO == ""))
+      {
+        console.log('B null - C null');
+         Address = `https://api.neshan.org/v4/direction?type=car&origin=${A}&destination=${D}&avoidTrafficZone=false&avoidOddEvenZone=false&&marker1Token=361834.hZGybjcv&marker2Token=301834.ONTQmytr&alternative=false&bearing=`
+      }
+
+      else if ((B_LA == "" || B_LO == "") && (C_LA != "" && C_LO != ""))
+      {
+        console.log('B null');
+         Address = `https://api.neshan.org/v4/direction?type=car&origin=${A}&destination=${D}&waypoints=${C}&avoidTrafficZone=false&avoidOddEvenZone=false&alternative=false&bearing=`
+
+      }
+      else if  ((C_LA == "" || C_LO == "") && (B_LA != "" && B_LO != ""))
+      {
+        console.log('C null');
+         Address = `https://api.neshan.org/v4/direction?type=car&origin=${A}&destination=${D}&waypoints=${B}&avoidTrafficZone=false&avoidOddEvenZone=false&alternative=false&bearing=`
+
+      }
+       else
+      { 
+         Address = `https://api.neshan.org/v4/direction?type=car&origin=${A}&destination=${D}&waypoints=${B}%7C${C}&avoidTrafficZone=false&avoidOddEvenZone=false&alternative=false&bearing=`
+
+    }
+      
+
+
+        fetch(Address, requestOptions)
+        .then(response => response.json())
+        .then(data => {
+          API_Result = data;
+        })
+      
+        .then( 
+          
+        window.onload = function() {
+
+        var Result_JSON = JSON.stringify(API_Result);
+
+        localStorage.setItem("Result_JSON", Result_JSON);
+
+        localStorage.setItem("A_1" , A_LO)
+        localStorage.setItem("A_2" , A_LA)
+         
+        localStorage.setItem("B_1" , B_LO)
+        localStorage.setItem("B_2" , B_LA)
+
+        localStorage.setItem("C_1" , C_LO)
+        localStorage.setItem("C_2" , C_LA)
+
+        localStorage.setItem("D_1" , D_LO) 
+        localStorage.setItem("D_2" , D_LA)
+  
+        console.log('API : ', Result_JSON)
+}
+)
+}
+
+  function API_Download() {
+          var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(API_Result));
+          var dlAnchorElem = document.getElementById('downloadAnchorElem');
+          dlAnchorElem.setAttribute("href",     dataStr     );
+          dlAnchorElem.setAttribute("download", "API-Result.json");
+          dlAnchorElem.click();
+}
+  
+      </script>
+    </div>
+  </body>
+</html>
