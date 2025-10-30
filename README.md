@@ -22,9 +22,9 @@ star if you like it ✨
   <br />
 
 <p align="center">
-  <img title="Fig1" height="250" src="images/Figure_1.png">
+  <img title="Fig1" height="210" src="images/Figure_1.png">
   <br />
-  <img title="Fig2" height="250" src="images/Figure_2.png">
+  <img title="Fig2" height="210" src="images/Figure_2.png">
   <br />
 </p>
 
